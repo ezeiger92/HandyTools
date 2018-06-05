@@ -1,0 +1,4 @@
+# HandyTools config
+wood_tools:
+  pickaxe_cobble_chance: 0.5
+  shovel_sapling_chance: 0.17

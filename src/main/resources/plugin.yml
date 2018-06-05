@@ -1,0 +1,16 @@
+name: HandyTools
+main: com.chromaclypse.handytools.ToolPlugin
+version: ${project.version}
+description: Early game tool mechanics
+author: ezeiger92
+depend: [ChromaLib]
+softdepend: [NoCheatPlus]
+commands:
+  handytools:
+    description: Root HandyTools command
+    usage: /<command> reload
+    permission: handytools.reload
+permissions:
+  handytools.reload:
+    description: Reload perm
+    default: op
