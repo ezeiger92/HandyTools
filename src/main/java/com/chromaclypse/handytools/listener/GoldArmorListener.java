@@ -33,21 +33,21 @@ public class GoldArmorListener implements Listener {
 		UUID key = event.getPlayer().getUniqueId();
 		Material itemType = event.getItem().getType();
 		
-		if(itemType == Material.GOLD_HELMET && helmetDamageExempt.remove(key)) {
+		if(itemType == Material.GOLDEN_HELMET && helmetDamageExempt.remove(key)) {
 			event.setDamage(0);
 		}
-		else if(itemType == Material.GOLD_CHESTPLATE && chestplateDamageExempt.remove(key)) {
+		else if(itemType == Material.GOLDEN_CHESTPLATE && chestplateDamageExempt.remove(key)) {
 			event.setDamage(0);
 		}
-		else if(itemType == Material.GOLD_LEGGINGS && leggingDamageExempt.remove(key)) {
+		else if(itemType == Material.GOLDEN_LEGGINGS && leggingDamageExempt.remove(key)) {
 			event.setDamage(0);
 		}
-		else if(itemType == Material.GOLD_BOOTS && bootDamageExempt.remove(key)) {
+		else if(itemType == Material.GOLDEN_BOOTS && bootDamageExempt.remove(key)) {
 			event.setDamage(0);
 		}
 	}
 	
-	private EnumSet<Material> goldArmor = EnumSet.of(Material.GOLD_HELMET, Material.GOLD_CHESTPLATE, Material.GOLD_LEGGINGS, Material.GOLD_BOOTS);
+	private EnumSet<Material> goldArmor = EnumSet.of(Material.GOLDEN_HELMET, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_LEGGINGS, Material.GOLDEN_BOOTS);
 
 	private int durabilityOf(ItemStack stack) {
 		return stack == null ? 0 : stack.getType().getMaxDurability() - stack.getDurability();
@@ -64,22 +64,22 @@ public class GoldArmorListener implements Listener {
 			boolean leggings = false;
 			boolean boots = false;
 			
-			if(Util.helmetIs(player, Material.GOLD_HELMET)) {
+			if(Util.helmetIs(player, Material.GOLDEN_HELMET)) {
 				lightDamage += config.helmet_light_damage;
 				helmet = true;
 			}
 			
-			if(Util.chestplateIs(player, Material.GOLD_CHESTPLATE)) {
+			if(Util.chestplateIs(player, Material.GOLDEN_CHESTPLATE)) {
 				lightDamage += config.chestplate_light_damage;
 				chestplate = true;
 			}
 			
-			if(Util.leggingIs(player, Material.GOLD_LEGGINGS)) {
+			if(Util.leggingIs(player, Material.GOLDEN_LEGGINGS)) {
 				lightDamage += config.legging_light_damage;
 				leggings = true;
 			}
 			
-			if(Util.bootIs(player, Material.GOLD_BOOTS)) {
+			if(Util.bootIs(player, Material.GOLDEN_BOOTS)) {
 				lightDamage += config.boot_light_damage;
 				boots = true;
 			}

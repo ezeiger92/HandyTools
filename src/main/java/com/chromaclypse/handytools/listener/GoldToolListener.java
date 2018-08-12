@@ -1,5 +1,6 @@
 package com.chromaclypse.handytools.listener;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -18,7 +19,6 @@ import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemMendEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.chromaclypse.api.Log;
 import com.chromaclypse.handytools.AOE;
 import com.chromaclypse.handytools.Util;
 import com.chromaclypse.handytools.ToolConfig.GoldTools;
@@ -32,19 +32,17 @@ public class GoldToolListener implements Listener {
 		this.config = config;
 	}
 	
+	private static final EnumSet<Material> goldTools = EnumSet.of(Material.GOLDEN_AXE,
+			Material.GOLDEN_PICKAXE, Material.GOLDEN_SHOVEL, Material.GOLDEN_HOE, Material.GOLDEN_SWORD);
+	
 	@EventHandler
 	public void onMend(PlayerItemMendEvent event) {
 		Material tool = event.getItem().getType();
 		
-		if(tool == Material.GOLD_AXE
-				|| tool == Material.GOLD_PICKAXE
-				|| tool == Material.GOLD_SPADE
-				|| tool == Material.GOLD_HOE
-				|| tool == Material.GOLD_SWORD)
+		if(goldTools.contains(tool))
 			event.setCancelled(true);
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=true)
 	public void onBlockBreak(BlockBreakEvent event) {
 		if(!event.getClass().equals(BlockBreakEvent.class))
@@ -56,27 +54,18 @@ public class GoldToolListener implements Listener {
 		Material type = event.getBlock().getType();
 		Material hand = event.getPlayer().getInventory().getItemInMainHand().getType();
 		
-		// When all blocks have their own ids (namely stone/granite/...) this won't be needed
-		byte data = event.getBlock().getData();
-		
 		// Check golden pickaxe vs stone
-		if(type == Material.STONE && hand == Material.GOLD_PICKAXE) {
-			if(data == 0 || (data & 1) == 1)
-				AOE.dig(event.getBlock(), event.getPlayer(),
-						config.pickaxe_depth,
-						config.pickaxe_width,
-						config.pickaxe_height,
-						config.pickaxe_tpc,
-						config.pickaxe_bpc);
+		if(Util.stoneTypes.contains(type) && hand == Material.GOLDEN_PICKAXE) {
+			AOE.dig(event.getBlock(), event.getPlayer(),
+					config.pickaxe_depth,
+					config.pickaxe_width,
+					config.pickaxe_height,
+					config.pickaxe_tpc,
+					config.pickaxe_bpc);
 		}
 		
-		else if(hand == Material.GOLD_SPADE) {
-			if(type == Material.GRASS ||
-				type == Material.DIRT ||
-				type == Material.SAND ||
-				type == Material.GRAVEL ||
-				type == Material.SOUL_SAND ||
-				type == Material.MYCEL)
+		else if(hand == Material.GOLDEN_SHOVEL) {
+			if(Util.dirtTypes.contains(type))
 					AOE.dig(event.getBlock(), event.getPlayer(),
 							config.spade_depth,
 							config.spade_width,
@@ -85,9 +74,8 @@ public class GoldToolListener implements Listener {
 							config.spade_bpc);
 		}
 		
-		else if(hand == Material.GOLD_AXE) {
-			if(type == Material.LOG ||
-				type == Material.LOG_2)
+		else if(hand == Material.GOLDEN_AXE) {
+			if(Util.logTypes.contains(type))
 				AOE.dig(event.getBlock(), event.getPlayer(), 9, 1, 1, 0, 9, Util.makeBasis(0, -90));
 		}
 	}
@@ -108,7 +96,7 @@ public class GoldToolListener implements Listener {
 			Player damager = (Player) event.getDamager();
 			LivingEntity entity = (LivingEntity) event.getEntity();
 			
-			if(damager.getInventory().getItemInMainHand().getType() == Material.GOLD_SWORD && 
+			if(damager.getInventory().getItemInMainHand().getType() == Material.GOLDEN_SWORD && 
 					entity.getHealth() > event.getFinalDamage())
 				itemDamageExempt.add(damager.getUniqueId());
 		}
@@ -121,7 +109,7 @@ public class GoldToolListener implements Listener {
 		if(killer != null) {
 			Material hand = killer.getInventory().getItemInMainHand().getType();
 		
-			if(hand == Material.GOLD_AXE && config.axe_decapitator) {
+			if(hand == Material.GOLDEN_AXE && config.axe_decapitator) {
 				ItemStack head = null;
 				
 				if(event.getEntity() instanceof Player) {

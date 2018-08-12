@@ -49,7 +49,7 @@ public class ToolConfig extends ConfigObject {
 			
 			public ArrayList<HeadEntry> entries = new ArrayList<>();
 			public static class HeadEntry {
-				public ItemStack item = new ItemStack(Material.SKULL_ITEM);
+				public ItemStack item = new ItemStack(Material.PLAYER_HEAD);
 				public double weight = 1.0;
 			}
 			

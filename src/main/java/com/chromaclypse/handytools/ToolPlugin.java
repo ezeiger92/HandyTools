@@ -3,15 +3,14 @@ package com.chromaclypse.handytools;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.SkullType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
-import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -62,6 +61,7 @@ public class ToolPlugin extends JavaPlugin {
 					.forceEnchant(Enchantment.LUCK, 1)
 					.display("&bLucky Rabbit's Foot")
 					.wrapLore("&5Uncanny luck in near-death scenarios")
+					.flag(ItemFlag.HIDE_ENCHANTS)
 					.get());
 
 			recipe.shape("GGG", "GRG", "GGG");
@@ -71,50 +71,47 @@ public class ToolPlugin extends JavaPlugin {
 		}
 		{
 			NamespacedKey key = new NamespacedKey(this, "totem_of_resurrection");
-			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemBuilder(Material.TOTEM)
+			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemBuilder(Material.TOTEM_OF_UNDYING)
 					.forceEnchant(Enchantment.ARROW_INFINITE, 1)
 					.display("&bTotem of Resurrection")
 					.wrapLore("&5And to the Reaper, we say:", " \"Not today!\"")
+					.flag(ItemFlag.HIDE_ENCHANTS)
 					.get());
 			
 			recipe.addIngredient(Material.DRAGON_EGG);
-			recipe.addIngredient(Material.TOTEM);
+			recipe.addIngredient(Material.TOTEM_OF_UNDYING);
 			getServer().addRecipe(recipe);
 		}
 		{
 			NamespacedKey key = new NamespacedKey(this, "notch_apple");
 			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.GOLDEN_APPLE, 1, (short)1));
 			
-			
-			@SuppressWarnings("deprecation")
-			MaterialData goldApple = new MaterialData(Material.GOLDEN_APPLE, (byte) 0);
-
 			recipe.shape("GGG", "GNG", "GGG");
 			recipe.setIngredient('N', Material.NETHER_STAR);
-			recipe.setIngredient('G', goldApple);
+			recipe.setIngredient('G', Material.ENCHANTED_GOLDEN_APPLE);
 			getServer().addRecipe(recipe);
 		}
-		{
+		/*{
 			NamespacedKey key = new NamespacedKey(this, "dragon_egg");
 			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.DRAGON_EGG));
 
 			recipe.shape("CHC", "OEO", "COC");
 			recipe.setIngredient('C', Material.END_CRYSTAL);
-			recipe.setIngredient('H', new ItemBuilder(SkullType.DRAGON).get().getData());
+			recipe.setIngredient('H', Material.DRAGON_HEAD);
 			recipe.setIngredient('E', Material.ELYTRA);
 			recipe.setIngredient('O', Material.OBSIDIAN);
 			getServer().addRecipe(recipe);
-		}
+		}*/
 		{
 			NamespacedKey key = new NamespacedKey(this, "totem_of_undying");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.TOTEM));
+			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.TOTEM_OF_UNDYING));
 
 			recipe.shape("GGG", "GEG", "GGG");
 			recipe.setIngredient('E', Material.EMERALD);
 			recipe.setIngredient('G', Material.GOLD_BLOCK);
 			getServer().addRecipe(recipe);
 		}
-		{
+		/*{
 			NamespacedKey key = new NamespacedKey(this, "elytra");
 			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.ELYTRA));
 
@@ -123,13 +120,14 @@ public class ToolPlugin extends JavaPlugin {
 			recipe.setIngredient('S', Material.SHULKER_SHELL);
 			recipe.setIngredient('N', Material.NETHER_STAR);
 			getServer().addRecipe(recipe);
-		}
+		}*/
 		{
 			NamespacedKey key = new NamespacedKey(this, "exploration_arrow");
 			ShapedRecipe recipe = new ShapedRecipe(key, new ItemBuilder(Material.SPECTRAL_ARROW)
 					.forceEnchant(Enchantment.LURE, 1)
 					.display("&bArrow of Exploration")
 					.wrapLore("&5An ender pearl AND an arrow!")
+					.flag(ItemFlag.HIDE_ENCHANTS)
 					.get());
 
 			recipe.shape(" E ", "EAE", " E ");
@@ -174,7 +172,7 @@ public class ToolPlugin extends JavaPlugin {
 			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemStack(Material.IRON_INGOT, 4));
 			
 			recipe.addIngredient(3, Material.EMERALD);
-			recipe.addIngredient(Material.IRON_BARDING);
+			recipe.addIngredient(Material.IRON_HORSE_ARMOR);
 			getServer().addRecipe(recipe);
 		}
 		{
@@ -182,7 +180,7 @@ public class ToolPlugin extends JavaPlugin {
 			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemStack(Material.GOLD_INGOT, 4));
 			
 			recipe.addIngredient(3, Material.EMERALD);
-			recipe.addIngredient(Material.GOLD_BARDING);
+			recipe.addIngredient(Material.GOLDEN_HORSE_ARMOR);
 			getServer().addRecipe(recipe);
 		}
 		{
@@ -190,7 +188,7 @@ public class ToolPlugin extends JavaPlugin {
 			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemStack(Material.DIAMOND, 4));
 			
 			recipe.addIngredient(3, Material.EMERALD);
-			recipe.addIngredient(Material.DIAMOND_BARDING);
+			recipe.addIngredient(Material.DIAMOND_HORSE_ARMOR);
 			getServer().addRecipe(recipe);
 		}
 	}

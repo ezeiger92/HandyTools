@@ -38,7 +38,7 @@ public class WoodToolListener implements Listener {
 		
 		ItemStack hand = ((Player)event.getDamager()).getInventory().getItemInMainHand();
 
-		if(hand == null || hand.getType() != Material.WOOD_SWORD)
+		if(hand == null || hand.getType() != Material.WOODEN_SWORD)
 			return;
 		
 		if(!(event.getEntity() instanceof LivingEntity))
@@ -53,7 +53,6 @@ public class WoodToolListener implements Listener {
 	
 	// Highest is second-to-last in order of execution
 	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=true)
-	@SuppressWarnings("deprecation")
 	public void onBlockBreak(BlockBreakEvent event) {
 		if(!event.getClass().equals(BlockBreakEvent.class))
 			return;
@@ -66,17 +65,14 @@ public class WoodToolListener implements Listener {
 
 		Location loc = event.getBlock().getLocation().add(0.5, 0.5, 0.5);
 		
-		// When all blocks have their own ids (namely stone/granite/...) this won't be needed
-		byte data = event.getBlock().getData();
-		
 		// Check wooden shovel vs grass
-		if(type == Material.GRASS && hand == Material.WOOD_SPADE && data == 0) {
+		if(type == Material.GRASS_BLOCK && hand == Material.WOODEN_SHOVEL) {
 			if(Util.rng(config.shovel_sapling_chance)) {
-				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.SAPLING));
+				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.OAK_SAPLING));
 			}
 		}
 		// Check wooden pickaxe vs stone
-		else if(type == Material.STONE && hand == Material.WOOD_PICKAXE && data == 0) {
+		else if(type == Material.STONE && hand == Material.WOODEN_PICKAXE) {
 			if(Util.rng(config.pickaxe_cobble_chance)) {
 				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.COBBLESTONE));
 			}
@@ -91,22 +87,22 @@ public class WoodToolListener implements Listener {
 		Material type = event.getClickedBlock().getType();
 		Material hand = event.getItem().getType();
 		
-		if(type == Material.GRASS && hand == Material.WOOD_HOE) {
+		if(type == Material.GRASS && hand == Material.WOODEN_HOE) {
 			if(new DummyBreakEvent(event.getClickedBlock(), event.getPlayer()).sendEvent()) {
 				if(Util.rng(config.hoe_seed_chance)) {
 					Location l = event.getClickedBlock().getLocation().add(0.5, 1.5, 0.5);
-					l.getWorld().dropItemNaturally(l, new ItemStack(Material.SEEDS));
+					l.getWorld().dropItemNaturally(l, new ItemStack(Material.WHEAT_SEEDS));
 				}
 			}
 		}
-		else if(hand == Material.WOOD_AXE && event.getAction() == Action.LEFT_CLICK_BLOCK) {
+		else if(hand == Material.WOODEN_AXE && event.getAction() == Action.LEFT_CLICK_BLOCK) {
 			ItemStack item = event.getItem();
 			
 			GameMode oldMode = event.getPlayer().getGameMode();
 			ItemMeta oldMeta = item.hasItemMeta() ? item.getItemMeta() : null;
 			ItemMeta newMeta = config.axe_item.getItemMeta();
 			
-			if(type == Material.WORKBENCH) {
+			if(type == Material.CRAFTING_TABLE) {
 				if(oldMeta == null || !oldMeta.serialize().equals(newMeta.serialize())) {
 					event.getPlayer().setGameMode(GameMode.ADVENTURE);
 					item.setItemMeta(config.axe_item.getItemMeta());

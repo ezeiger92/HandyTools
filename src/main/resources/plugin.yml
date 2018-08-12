@@ -3,6 +3,7 @@ main: com.chromaclypse.handytools.ToolPlugin
 version: ${project.version}
 description: Early game tool mechanics
 author: ezeiger92
+api-version: 1.13
 depend: [ChromaLib]
 softdepend: [NoCheatPlus]
 commands:

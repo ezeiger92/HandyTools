@@ -1,5 +1,7 @@
 package com.chromaclypse.handytools;
 
+import java.util.EnumSet;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -9,6 +11,17 @@ public class Util {
 	public static boolean rng(double threshold) {
 		return Math.random() < threshold;
 	}
+
+
+	public static final EnumSet<Material> stoneTypes = EnumSet.of(Material.STONE,
+			Material.GRANITE, Material.DIORITE, Material.ANDESITE);
+
+	public static final EnumSet<Material> dirtTypes = EnumSet.of(Material.GRASS_BLOCK,
+			Material.DIRT, Material.COARSE_DIRT, Material.PODZOL, Material.SAND, Material.GRAVEL,
+			Material.SOUL_SAND, Material.RED_SAND, Material.MYCELIUM);
+
+	public static final EnumSet<Material> logTypes = EnumSet.of(Material.OAK_LOG,
+			Material.SPRUCE_LOG, Material.BIRCH_LOG, Material.JUNGLE_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG);
 	
 	public static Vector[] makeBasis(float yaw, float pitch) {
 		Vector direction;
