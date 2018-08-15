@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.chromaclypse.api.Log;
 import com.chromaclypse.api.item.ItemBuilder;
 import com.chromaclypse.api.plugin.FuturePlugin;
+import com.chromaclypse.handytools.listener.FarmlandListener;
 import com.chromaclypse.handytools.listener.ChainArmorListener;
 import com.chromaclypse.handytools.listener.CustomItemListener;
 import com.chromaclypse.handytools.listener.GoldArmorListener;
@@ -50,8 +51,9 @@ public class ToolPlugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new LeatherArmorListener(config.leather_armor), this);
 		getServer().getPluginManager().registerEvents(new ChainArmorListener(config.chain_armor), this);
 		getServer().getPluginManager().registerEvents(new GoldArmorListener(config.gold_armor), this);
-		
+
 		getServer().getPluginManager().registerEvents(new CustomItemListener(), this);
+		getServer().getPluginManager().registerEvents(new FarmlandListener(), this);
 		
 		getCommand("handytools").setExecutor(this);
 
