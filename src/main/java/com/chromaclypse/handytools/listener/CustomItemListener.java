@@ -252,12 +252,18 @@ public class CustomItemListener implements Listener {
 				}
 				
 				event.setDroppedExp(Math.min(event.getDroppedExp(), 0));
-				hand.setAmount(hand.getAmount() - 1);
 				
-				for(ItemStack is : p.getInventory().addItem(new ItemStack(Material.EXPERIENCE_BOTTLE)).values()) {
-					Location loc = p.getLocation();
+				if(hand.getAmount() == 1) {
+					hand.setType(Material.EXPERIENCE_BOTTLE);
+				}
+				else {
+					hand.setAmount(hand.getAmount() - 1);
 					
-					loc.getWorld().dropItemNaturally(loc, is);
+					for(ItemStack is : p.getInventory().addItem(new ItemStack(Material.EXPERIENCE_BOTTLE)).values()) {
+						Location loc = p.getLocation();
+						
+						loc.getWorld().dropItemNaturally(loc, is);
+					}
 				}
 			}
 		}
