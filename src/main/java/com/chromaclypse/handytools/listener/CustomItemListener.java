@@ -217,11 +217,15 @@ public class CustomItemListener implements Listener {
 			return;
 		}
 		
+		int partialHash = event.getEntity().getEntityId();
+		
 		for(ItemStack is : event.getDrops()) {
 			Material type = is.getType();
 			
+			int hash = partialHash + type.name().hashCode();
+			
 			if(type.isRecord() && type != Material.MUSIC_DISC_CAT && type != Material.MUSIC_DISC_13) {
-				if(type.name().hashCode() % 5 > 3) {
+				if(hash % 5 >= 3) {
 					is.setType(Material.MUSIC_DISC_13);
 				}
 				else {
