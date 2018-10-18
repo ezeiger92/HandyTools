@@ -50,7 +50,7 @@ public class GoldArmorListener implements Listener {
 	private EnumSet<Material> goldArmor = EnumSet.of(Material.GOLDEN_HELMET, Material.GOLDEN_CHESTPLATE, Material.GOLDEN_LEGGINGS, Material.GOLDEN_BOOTS);
 
 	private int durabilityOf(ItemStack stack) {
-		return stack == null ? 0 : stack.getType().getMaxDurability() - stack.getDurability();
+		return stack == null ? 0 : stack.getType().getMaxDurability() - Util.getDamage(stack);
 	}
 	
 	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=true)
@@ -110,8 +110,9 @@ public class GoldArmorListener implements Listener {
 				costs[0] = cost - accum;
 				
 				for(int i = 0; i < 4; ++i)
-					if(armor[i] != null)
-						armor[i].setDurability((short)Math.min(armor[i].getType().getMaxDurability(), armor[i].getDurability() + costs[i]));
+					if(armor[i] != null) {
+						Util.setDamage(armor[i], Math.min(armor[i].getType().getMaxDurability(), Util.getDamage(armor[i]) + costs[i]));
+					}
 				
 				player.setHealth(1.0);
 				event.setDamage(0);

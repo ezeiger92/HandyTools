@@ -86,11 +86,11 @@ public class ToolPlugin extends JavaPlugin {
 		}
 		{
 			NamespacedKey key = new NamespacedKey(this, "notch_apple");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.GOLDEN_APPLE, 1, (short)1));
+			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1));
 			
 			recipe.shape("GGG", "GNG", "GGG");
 			recipe.setIngredient('N', Material.NETHER_STAR);
-			recipe.setIngredient('G', Material.ENCHANTED_GOLDEN_APPLE);
+			recipe.setIngredient('G', Material.GOLDEN_APPLE);
 			getServer().addRecipe(recipe);
 		}
 		/*{

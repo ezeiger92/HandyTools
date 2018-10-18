@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.chromaclypse.handytools</groupId>
 	<artifactId>HandyTools</artifactId>
-	<version>2.1.0</version>
+	<version>2.2.0</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -31,6 +31,10 @@
 			<id>local-repo</id>
 			<url>file:\\${project.basedir}\..\libs\repo</url>
 		</repository>
+		<repository>
+			<id>md5-snapshots</id>
+			<url>https://repo.md-5.net/content/repositories/snapshots/</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
@@ -46,9 +50,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>fr.neatmonster.nocheatplus</groupId>
-			<artifactId>NoCheatPlus</artifactId>
-			<version>3.15.2-SNAPSHOT-sMD5NET-b1113</version>
+			<groupId>fr.neatmonster</groupId>
+			<artifactId>nocheatplus</artifactId>
+			<version>3.16.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.util.Vector;
 
 public class Util {
@@ -22,6 +23,21 @@ public class Util {
 
 	public static final EnumSet<Material> logTypes = EnumSet.of(Material.OAK_LOG,
 			Material.SPRUCE_LOG, Material.BIRCH_LOG, Material.JUNGLE_LOG, Material.ACACIA_LOG, Material.DARK_OAK_LOG);
+	
+	public static int getDamage(ItemStack stack) {
+		if(stack.getData() instanceof Damageable) {
+			return ((Damageable)stack.getData()).getDamage();
+		}
+		else {
+			return 0;
+		}
+	}
+	
+	public static void setDamage(ItemStack stack, int damage) {
+		if(stack.getData() instanceof Damageable) {
+			((Damageable)stack.getData()).setDamage(damage);
+		}
+	}
 	
 	public static Vector[] makeBasis(float yaw, float pitch) {
 		Vector direction;
