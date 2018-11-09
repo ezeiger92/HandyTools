@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -107,6 +108,9 @@ public class WoodToolListener implements Listener {
 					event.getPlayer().setGameMode(GameMode.ADVENTURE);
 					item.setItemMeta(config.axe_item.getItemMeta());
 					Bukkit.getScheduler().runTaskLater(ToolPlugin.instance, () -> {
+						
+						((Damageable)oldMeta).setDamage(((Damageable)item.getItemMeta()).getDamage());
+						
 						item.setItemMeta(oldMeta);
 						
 						event.getPlayer().updateInventory();

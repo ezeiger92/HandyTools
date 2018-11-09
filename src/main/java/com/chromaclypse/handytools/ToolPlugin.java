@@ -8,9 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,6 +16,7 @@ import com.chromaclypse.api.Log;
 import com.chromaclypse.api.item.ItemBuilder;
 import com.chromaclypse.api.plugin.FuturePlugin;
 import com.chromaclypse.handytools.listener.FarmlandListener;
+import com.chromaclypse.handytools.listener.CauldronItems;
 import com.chromaclypse.handytools.listener.ChainArmorListener;
 import com.chromaclypse.handytools.listener.CustomItemListener;
 import com.chromaclypse.handytools.listener.GoldArmorListener;
@@ -55,6 +54,8 @@ public class ToolPlugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new CustomItemListener(), this);
 		getServer().getPluginManager().registerEvents(new FarmlandListener(), this);
 		
+		getServer().getPluginManager().registerEvents(new CauldronItems(config.caudron_recipes), this);
+		
 		getCommand("handytools").setExecutor(this);
 
 		{
@@ -72,58 +73,6 @@ public class ToolPlugin extends JavaPlugin {
 			getServer().addRecipe(recipe);
 		}
 		{
-			NamespacedKey key = new NamespacedKey(this, "totem_of_resurrection");
-			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemBuilder(Material.TOTEM_OF_UNDYING)
-					.forceEnchant(Enchantment.ARROW_INFINITE, 1)
-					.display("&bTotem of Resurrection")
-					.wrapLore("&5And to the Reaper, we say:", " \"Not today!\"")
-					.flag(ItemFlag.HIDE_ENCHANTS)
-					.get());
-			
-			recipe.addIngredient(Material.DRAGON_EGG);
-			recipe.addIngredient(Material.TOTEM_OF_UNDYING);
-			getServer().addRecipe(recipe);
-		}
-		{
-			NamespacedKey key = new NamespacedKey(this, "notch_apple");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1));
-			
-			recipe.shape("GGG", "GNG", "GGG");
-			recipe.setIngredient('N', Material.NETHER_STAR);
-			recipe.setIngredient('G', Material.GOLDEN_APPLE);
-			getServer().addRecipe(recipe);
-		}
-		/*{
-			NamespacedKey key = new NamespacedKey(this, "dragon_egg");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.DRAGON_EGG));
-
-			recipe.shape("CHC", "OEO", "COC");
-			recipe.setIngredient('C', Material.END_CRYSTAL);
-			recipe.setIngredient('H', Material.DRAGON_HEAD);
-			recipe.setIngredient('E', Material.ELYTRA);
-			recipe.setIngredient('O', Material.OBSIDIAN);
-			getServer().addRecipe(recipe);
-		}*/
-		{
-			NamespacedKey key = new NamespacedKey(this, "totem_of_undying");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.TOTEM_OF_UNDYING));
-
-			recipe.shape("GGG", "GEG", "GGG");
-			recipe.setIngredient('E', Material.EMERALD);
-			recipe.setIngredient('G', Material.GOLD_BLOCK);
-			getServer().addRecipe(recipe);
-		}
-		/*{
-			NamespacedKey key = new NamespacedKey(this, "elytra");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.ELYTRA));
-
-			recipe.shape("SLS", "LNL", "L L");
-			recipe.setIngredient('L', Material.LEATHER);
-			recipe.setIngredient('S', Material.SHULKER_SHELL);
-			recipe.setIngredient('N', Material.NETHER_STAR);
-			getServer().addRecipe(recipe);
-		}*/
-		{
 			NamespacedKey key = new NamespacedKey(this, "exploration_arrow");
 			ShapedRecipe recipe = new ShapedRecipe(key, new ItemBuilder(Material.SPECTRAL_ARROW)
 					.forceEnchant(Enchantment.LURE, 1)
@@ -135,62 +84,6 @@ public class ToolPlugin extends JavaPlugin {
 			recipe.shape(" E ", "EAE", " E ");
 			recipe.setIngredient('E', Material.ENDER_PEARL);
 			recipe.setIngredient('A', Material.SPECTRAL_ARROW);
-			getServer().addRecipe(recipe);
-		}
-		{
-			NamespacedKey key = new NamespacedKey(this, "chain_helmet");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.CHAINMAIL_HELMET));
-
-			recipe.shape("NNN", "N N");
-			recipe.setIngredient('N', Material.IRON_NUGGET);
-			getServer().addRecipe(recipe);
-		}
-		{
-			NamespacedKey key = new NamespacedKey(this, "chain_chestplate");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.CHAINMAIL_CHESTPLATE));
-
-			recipe.shape("N N", "NNN", "NNN");
-			recipe.setIngredient('N', Material.IRON_NUGGET);
-			getServer().addRecipe(recipe);
-		}
-		{
-			NamespacedKey key = new NamespacedKey(this, "chain_leggings");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.CHAINMAIL_LEGGINGS));
-
-			recipe.shape("NNN", "N N", "N N");
-			recipe.setIngredient('N', Material.IRON_NUGGET);
-			getServer().addRecipe(recipe);
-		}
-		{
-			NamespacedKey key = new NamespacedKey(this, "chain_boots");
-			ShapedRecipe recipe = new ShapedRecipe(key, new ItemStack(Material.CHAINMAIL_BOOTS));
-
-			recipe.shape("N N", "N N");
-			recipe.setIngredient('N', Material.IRON_NUGGET);
-			getServer().addRecipe(recipe);
-		}
-		{
-			NamespacedKey key = new NamespacedKey(this, "uncraft_iron_barding");
-			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemStack(Material.IRON_INGOT, 4));
-			
-			recipe.addIngredient(3, Material.EMERALD);
-			recipe.addIngredient(Material.IRON_HORSE_ARMOR);
-			getServer().addRecipe(recipe);
-		}
-		{
-			NamespacedKey key = new NamespacedKey(this, "uncraft_gold_barding");
-			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemStack(Material.GOLD_INGOT, 4));
-			
-			recipe.addIngredient(3, Material.EMERALD);
-			recipe.addIngredient(Material.GOLDEN_HORSE_ARMOR);
-			getServer().addRecipe(recipe);
-		}
-		{
-			NamespacedKey key = new NamespacedKey(this, "uncraft_diamond_barding");
-			ShapelessRecipe recipe = new ShapelessRecipe(key, new ItemStack(Material.DIAMOND, 4));
-			
-			recipe.addIngredient(3, Material.EMERALD);
-			recipe.addIngredient(Material.DIAMOND_HORSE_ARMOR);
 			getServer().addRecipe(recipe);
 		}
 	}

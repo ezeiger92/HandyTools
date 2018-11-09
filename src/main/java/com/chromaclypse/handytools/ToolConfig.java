@@ -2,10 +2,12 @@ package com.chromaclypse.handytools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.chromaclypse.api.Defaults;
 import com.chromaclypse.api.config.ConfigObject;
 
 public class ToolConfig extends ConfigObject {
@@ -89,5 +91,10 @@ public class ToolConfig extends ConfigObject {
 		public int boot_light_damage = 4;
 		
 		public int health_cost = 20;
+	}
+	
+	public CauldronConfig caudron_recipes = new CauldronConfig();
+	public static class CauldronConfig {
+		public List<String> world_blacklist = Defaults.emptyList();
 	}
 }
