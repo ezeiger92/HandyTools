@@ -80,6 +80,41 @@ public class WoodToolListener implements Listener {
 		}
 	}
 	
+	public static int getDamage(ItemStack stack) {
+		if(stack.hasItemMeta()) {
+			ItemMeta meta = stack.getItemMeta();
+			
+			if(meta instanceof Damageable) {
+				return ((Damageable)meta).getDamage();
+			}
+		}
+		
+		return 0;
+	}
+	
+	public static int getDamage(ItemMeta meta) {
+		if(meta instanceof Damageable) {
+			return ((Damageable)meta).getDamage();
+		}
+		
+		return 0;
+	}
+	
+	public static void setDamage(ItemStack stack, int damage) {
+		if(Bukkit.getItemFactory().getItemMeta(stack.getType()) instanceof Damageable) {
+			ItemMeta meta = stack.getItemMeta();
+			
+			((Damageable)meta).setDamage(damage);
+			stack.setItemMeta(meta);
+		}
+	}
+	
+	public static void setDamage(ItemMeta meta, int damage) {
+		if(meta instanceof Damageable) {
+			((Damageable)meta).setDamage(damage);
+		}
+	}
+	
 	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=true)
 	public void onInteract(PlayerInteractEvent event) {
 		if(!event.hasBlock() || event.getHand() != EquipmentSlot.HAND || event.getItem() == null)
@@ -103,18 +138,28 @@ public class WoodToolListener implements Listener {
 			ItemMeta oldMeta = item.hasItemMeta() ? item.getItemMeta() : null;
 			ItemMeta newMeta = config.axe_item.getItemMeta();
 			
+			if(oldMeta != null) {
+				setDamage(newMeta, getDamage(oldMeta));
+			}
+			
 			if(type == Material.CRAFTING_TABLE) {
 				if(oldMeta == null || !oldMeta.serialize().equals(newMeta.serialize())) {
 					event.getPlayer().setGameMode(GameMode.ADVENTURE);
-					item.setItemMeta(config.axe_item.getItemMeta());
+					item.setItemMeta(newMeta);
 					Bukkit.getScheduler().runTaskLater(ToolPlugin.instance, () -> {
 						
-						((Damageable)oldMeta).setDamage(((Damageable)item.getItemMeta()).getDamage());
-						
-						item.setItemMeta(oldMeta);
-						
-						event.getPlayer().updateInventory();
-						event.getPlayer().setGameMode(oldMode);
+						if(item.getType() != Material.AIR) {
+							int damage = getDamage(item);
+							
+							item.setItemMeta(oldMeta);
+							
+							if(damage > 0) {
+								setDamage(item, damage);
+							}
+							
+							event.getPlayer().updateInventory();
+							event.getPlayer().setGameMode(oldMode);
+						}
 					}, 1);
 				}
 			}
