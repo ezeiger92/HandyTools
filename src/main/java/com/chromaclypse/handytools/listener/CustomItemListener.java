@@ -1,6 +1,7 @@
 package com.chromaclypse.handytools.listener;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -37,10 +38,27 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.chromaclypse.handytools.ToolPlugin;
 
 public class CustomItemListener implements Listener {
+	
+	private static final HashMap<PotionEffectType, Material> potionDiskMapper = new HashMap<>();
+	
+	static {
+		potionDiskMapper.put(PotionEffectType.FIRE_RESISTANCE, Material.MUSIC_DISC_BLOCKS);
+		potionDiskMapper.put(PotionEffectType.INCREASE_DAMAGE, Material.MUSIC_DISC_CHIRP);
+		potionDiskMapper.put(PotionEffectType.JUMP, Material.MUSIC_DISC_FAR);
+		
+		potionDiskMapper.put(PotionEffectType.NIGHT_VISION, Material.MUSIC_DISC_MALL);
+		potionDiskMapper.put(PotionEffectType.SLOW_DIGGING, Material.MUSIC_DISC_MELLOHI);
+		potionDiskMapper.put(PotionEffectType.WEAKNESS, Material.MUSIC_DISC_STAL);
+		
+		potionDiskMapper.put(PotionEffectType.SLOW_FALLING, Material.MUSIC_DISC_STRAD);
+		potionDiskMapper.put(PotionEffectType.POISON, Material.MUSIC_DISC_WARD);
+		potionDiskMapper.put(PotionEffectType.WATER_BREATHING, Material.MUSIC_DISC_WAIT);
+	}
 	
 	@EventHandler
 	public void onRes(EntityResurrectEvent event) {
@@ -219,18 +237,32 @@ public class CustomItemListener implements Listener {
 		
 		int partialHash = event.getEntity().getEntityId();
 		
+		drops:
 		for(ItemStack is : event.getDrops()) {
 			Material type = is.getType();
 			
 			int hash = partialHash + type.name().hashCode();
 			
-			if(type.isRecord() && type != Material.MUSIC_DISC_CAT && type != Material.MUSIC_DISC_13) {
-				if(hash % 5 >= 3) {
-					is.setType(Material.MUSIC_DISC_13);
+			if(type.isRecord()) {
+				for(PotionEffect effect : event.getEntity().getActivePotionEffects()) {
+					Material found = potionDiskMapper.get(effect.getType());
+					
+					if(found != null) {
+						is.setType(found);
+						break drops;
+					}
 				}
-				else {
-					is.setType(Material.MUSIC_DISC_CAT);
+				
+				if(type != Material.MUSIC_DISC_CAT && type != Material.MUSIC_DISC_13) {
+					if(hash % 5 >= 3) {
+						is.setType(Material.MUSIC_DISC_13);
+					}
+					else {
+						is.setType(Material.MUSIC_DISC_CAT);
+					}
 				}
+				
+				break;
 			}
 		}
 	}
