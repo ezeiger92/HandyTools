@@ -2,6 +2,7 @@ package com.chromaclypse.handytools.listener;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -40,24 +41,23 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.chromaclypse.handytools.MobConfig;
 import com.chromaclypse.handytools.ToolPlugin;
 
 public class CustomItemListener implements Listener {
 	
-	private static final HashMap<PotionEffectType, Material> potionDiskMapper = new HashMap<>();
+	private final HashMap<PotionEffectType, Material> potionDiskMapper = new HashMap<>();
 	
-	static {
-		potionDiskMapper.put(PotionEffectType.FIRE_RESISTANCE, Material.MUSIC_DISC_BLOCKS);
-		potionDiskMapper.put(PotionEffectType.INCREASE_DAMAGE, Material.MUSIC_DISC_CHIRP);
-		potionDiskMapper.put(PotionEffectType.JUMP, Material.MUSIC_DISC_FAR);
+	public CustomItemListener(MobConfig config) {
 		
-		potionDiskMapper.put(PotionEffectType.NIGHT_VISION, Material.MUSIC_DISC_MALL);
-		potionDiskMapper.put(PotionEffectType.SLOW_DIGGING, Material.MUSIC_DISC_MELLOHI);
-		potionDiskMapper.put(PotionEffectType.WEAKNESS, Material.MUSIC_DISC_STAL);
-		
-		potionDiskMapper.put(PotionEffectType.SLOW_FALLING, Material.MUSIC_DISC_STRAD);
-		potionDiskMapper.put(PotionEffectType.POISON, Material.MUSIC_DISC_WARD);
-		potionDiskMapper.put(PotionEffectType.WATER_BREATHING, Material.MUSIC_DISC_WAIT);
+		for(Map.Entry<String, String> entry : config.potion_disk_map.entrySet()) {
+			PotionEffectType effect = PotionEffectType.getByName(entry.getKey());
+			Material disk = Material.matchMaterial(entry.getValue());
+			
+			if(effect != null && disk != null) {
+				potionDiskMapper.put(effect, disk);
+			}
+		}
 	}
 	
 	@EventHandler

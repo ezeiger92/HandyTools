@@ -122,14 +122,14 @@ public class FarmlandListener implements Listener {
 					listeningFor = new ItemStack(seed, 1);
 					BlockState state = block.getState();
 					
-					try {
+					/*try {
 						Object blockPosition = Reflect.NMS("BlockPosition").getConstructor(int.class, int.class, int.class)
 								.newInstance(l.getBlockX(), l.getBlockY(), l.getBlockZ());
 						Object worldObject = l.getWorld().getClass().getMethod("getHandle").invoke(l.getWorld());
 						
 						Reflect.NMS("World").getMethod("setAir", blockPosition.getClass(), boolean.class).invoke(worldObject, blockPosition, true);
 					}
-					catch(Exception e) {
+					catch(Exception e) {*/
 						l.getWorld().spawnParticle(Particle.BLOCK_DUST, l, 50, 0.5, 0.5, 0.5, crop);
 						
 						Sound sound;
@@ -142,7 +142,7 @@ public class FarmlandListener implements Listener {
 						
 						l.getWorld().playSound(l, sound, SoundCategory.BLOCKS, 1.0f, 0.80f);
 						block.breakNaturally(player.getInventory().getItemInMainHand());
-					}
+					//}
 					
 					// Force the crop back into existence (if setAir removed it) so we can set age below
 					state.update(true, false);

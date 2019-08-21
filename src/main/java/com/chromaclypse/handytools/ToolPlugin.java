@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.Plugin;
@@ -26,6 +27,7 @@ import com.chromaclypse.handytools.listener.WoodToolListener;
 
 public class ToolPlugin extends JavaPlugin {
 	ToolConfig config = new ToolConfig();
+	MobConfig mobConfig = new MobConfig();
 	NCPCompat compat = new NCPCompat();
 	
 	public static ToolPlugin instance;
@@ -42,19 +44,7 @@ public class ToolPlugin extends JavaPlugin {
 			}
 		};
 		
-		config.init(this);
-		
-		getServer().getPluginManager().registerEvents(new WoodToolListener(config.wood_tools), this);
-		getServer().getPluginManager().registerEvents(new GoldToolListener(config.gold_tools), this);
-		
-		getServer().getPluginManager().registerEvents(new LeatherArmorListener(config.leather_armor), this);
-		getServer().getPluginManager().registerEvents(new ChainArmorListener(config.chain_armor), this);
-		getServer().getPluginManager().registerEvents(new GoldArmorListener(config.gold_armor), this);
-
-		getServer().getPluginManager().registerEvents(new CustomItemListener(), this);
-		getServer().getPluginManager().registerEvents(new FarmlandListener(), this);
-		
-		getServer().getPluginManager().registerEvents(new CauldronItems(config.caudron_recipes), this);
+		init();
 		
 		getCommand("handytools").setExecutor(this);
 
@@ -89,12 +79,35 @@ public class ToolPlugin extends JavaPlugin {
 	}
 	
 	@Override
+	public void onDisable() {
+		HandlerList.unregisterAll(this);
+	}
+	
+	private void init() {
+		config.init(this);
+		mobConfig.init(this);
+		
+		getServer().getPluginManager().registerEvents(new WoodToolListener(config.wood_tools), this);
+		getServer().getPluginManager().registerEvents(new GoldToolListener(config.gold_tools), this);
+		
+		getServer().getPluginManager().registerEvents(new LeatherArmorListener(config.leather_armor), this);
+		getServer().getPluginManager().registerEvents(new ChainArmorListener(config.chain_armor), this);
+		getServer().getPluginManager().registerEvents(new GoldArmorListener(config.gold_armor), this);
+
+		getServer().getPluginManager().registerEvents(new CustomItemListener(mobConfig), this);
+		getServer().getPluginManager().registerEvents(new FarmlandListener(), this);
+		
+		getServer().getPluginManager().registerEvents(new CauldronItems(config.caudron_recipes), this);
+	}
+	
+	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(args.length > 0) {
 			String arg1 = args[0];
 			if("reload".equalsIgnoreCase(arg1)) {
 				sender.sendMessage(ChatColor.GREEN + "HandyTools reloaded");
-				config.init(this);
+				onDisable();
+				init();
 			}
 			else if("saveAxe".equalsIgnoreCase(arg1)) {
 				config.wood_tools.axe_item = ((Player)sender).getInventory().getItemInMainHand();
