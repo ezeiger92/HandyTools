@@ -13,11 +13,11 @@ import org.bukkit.SoundCategory;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Farmland;
-import org.bukkit.entity.LingeringPotion;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.Event.Result;
@@ -26,12 +26,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.entity.LingeringPotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-
-import com.chromaclypse.api.Reflect;
 
 public class FarmlandListener implements Listener {
 	private static final EnumSet<Material> crops;
@@ -193,6 +192,21 @@ public class FarmlandListener implements Listener {
 		
 		soil.setMoisture(0);
 		block.setBlockData(soil);
+		
+		Block above = block.getRelative(BlockFace.UP);
+		
+		if(crops.contains(above.getType())) {
+			Ageable crop;
+			
+			if(block.getBlockData() instanceof Ageable) {
+				crop = (Ageable) block.getBlockData();
+				
+				int dec = Math.max(crop.getMaximumAge() / 4, 1);
+				
+				crop.setAge(Math.max(crop.getAge() - dec, 0));
+				above.setBlockData(crop);
+			}
+		}
 		return true;
 	}
 	
@@ -244,7 +258,7 @@ public class FarmlandListener implements Listener {
 			ThrownPotion potion = (ThrownPotion) event.getEntity();
 			
 			if(potion.getEffects().isEmpty()) {
-				hydrate(potion.getLocation(), potion instanceof LingeringPotion ? 2 : 1);
+				hydrate(potion.getLocation(), event instanceof LingeringPotionSplashEvent ? 2 : 1);
 			}
 		}
 	}

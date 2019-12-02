@@ -14,9 +14,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.chromaclypse.api.Log;
+import com.chromaclypse.api.command.Dispatch;
 import com.chromaclypse.api.item.ItemBuilder;
 import com.chromaclypse.api.plugin.FuturePlugin;
 import com.chromaclypse.handytools.listener.FarmlandListener;
+import com.chromaclypse.handytools.command.Echo;
+import com.chromaclypse.handytools.command.ModifyItem;
 import com.chromaclypse.handytools.listener.CauldronItems;
 import com.chromaclypse.handytools.listener.ChainArmorListener;
 import com.chromaclypse.handytools.listener.CustomItemListener;
@@ -47,6 +50,8 @@ public class ToolPlugin extends JavaPlugin {
 		init();
 		
 		getCommand("handytools").setExecutor(this);
+		getCommand("echo").setExecutor(new Echo());
+		getCommand("util").setExecutor(new Dispatch(ModifyItem.class));
 
 		{
 			NamespacedKey key = new NamespacedKey(this, "lucky_rabbit_foot");

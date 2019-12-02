@@ -11,7 +11,21 @@ commands:
     description: Root HandyTools command
     usage: /<command> reload
     permission: handytools.reload
+  util:
+    description: Utility command
+    usage: /<command> <args...>
+    permission: handytools.utility
+  echo:
+    description: Prints text back
+    usage: /<command> <args...>
+    permission: handytools.feedback
 permissions:
   handytools.reload:
     description: Reload perm
     default: op
+  handytools.utility:
+    description: Utility command perm
+    default: op
+  handytools.feedback:
+    description: Feedback commands perm
+    default: true
