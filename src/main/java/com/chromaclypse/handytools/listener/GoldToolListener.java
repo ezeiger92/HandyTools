@@ -1,11 +1,16 @@
 package com.chromaclypse.handytools.listener;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,21 +20,31 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerItemMendEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.Repairable;
+import org.bukkit.persistence.PersistentDataType;
 
+import com.chromaclypse.api.messages.Text;
 import com.chromaclypse.handytools.AOE;
+import com.chromaclypse.handytools.ToolPlugin;
 import com.chromaclypse.handytools.Util;
+import com.chromaclypse.handytools.command.PlayerState;
 import com.chromaclypse.handytools.ToolConfig.GoldTools;
 import com.chromaclypse.handytools.ToolConfig.GoldTools.HeadData;
 import com.chromaclypse.handytools.ToolConfig.GoldTools.HeadData.HeadEntry;
 
 public class GoldToolListener implements Listener {
 	private GoldTools config;
+	private PlayerState stateConfig;
 	
-	public GoldToolListener(GoldTools config) {
+	public GoldToolListener(GoldTools config, PlayerState stateConfig) {
 		this.config = config;
+		this.stateConfig = stateConfig;
 	}
 	
 	private static final EnumSet<Material> goldTools = EnumSet.of(Material.GOLDEN_AXE,
@@ -37,10 +52,162 @@ public class GoldToolListener implements Listener {
 	
 	@EventHandler
 	public void onMend(PlayerItemMendEvent event) {
-		Material tool = event.getItem().getType();
+		ItemStack item = event.getItem();
 		
-		if(goldTools.contains(tool))
+		PlayerState.State state = stateConfig.players.get(event.getPlayer().getUniqueId().toString());
+		
+		if(state != null && "new".equals(state.mending_mode)) {
+				event.setCancelled(true);
+		}
+		else if(goldTools.contains(item.getType())) {
 			event.setCancelled(true);
+		}
+	}
+	
+	private boolean isMendable(ItemStack mend) {
+		return mend != null && mend.hasItemMeta() && mend.getItemMeta().hasEnchant(Enchantment.MENDING);
+	}
+	
+	private Random random = new Random();
+	
+	@EventHandler
+	public void onNewMend(PlayerExpChangeEvent event) {
+		PlayerState.State state = stateConfig.players.get(event.getPlayer().getUniqueId().toString());
+		
+		if(state != null && "new".equals(state.mending_mode)) {
+			List<ItemStack> items = new ArrayList<>();
+			
+			for(ItemStack i : event.getPlayer().getInventory().getArmorContents()) {
+				if(isMendable(i)) {
+					items.add(i);
+				}
+			}
+			
+			ItemStack i = event.getPlayer().getInventory().getItemInMainHand();
+			if(isMendable(i)) {
+				items.add(i);
+			}
+			
+			i = event.getPlayer().getInventory().getItemInOffHand();
+			if(isMendable(i)) {
+				items.add(i);
+			}
+			
+			if(items.size() == 0) {
+				return;
+			}
+			
+			ItemStack item = items.get(random.nextInt(items.size()));
+			
+			int newAmt = newMend(item, event.getAmount());
+			event.setAmount(newAmt);
+		}
+	}
+	
+	private final NamespacedKey PARTIAL_REPAIR = new NamespacedKey(ToolPlugin.instance, "partialRepair");
+	
+	private final String REPAIR_STR = Text.format().colorize("&7Repair Cost: &f");
+	
+	private final void updateLore(ItemMeta meta, String str) {
+		List<String> lore;
+		
+		if(!meta.hasLore()) {
+			if(str == null) {
+				return;
+			}
+			lore = new ArrayList<String>();
+		}
+		else {
+			lore = new ArrayList<String>(meta.getLore());
+		}
+		
+		int index = -1;
+		for(int i = 0; i < lore.size(); ++i) {
+			if(lore.get(i).startsWith(REPAIR_STR)) {
+				index = i;
+				break;
+			}
+		}
+		
+		if(index >= 0) {
+			if(str == null) {
+				lore.remove(index);
+			}
+			else {
+				lore.set(index, REPAIR_STR + Text.format().colorize(str));
+			}
+		}
+		else if(str != null) {
+			lore.add(REPAIR_STR + Text.format().colorize(str));
+		}
+		
+		meta.setLore(lore);
+	}
+	
+	private final int newMend(ItemStack item, int amount) {
+		
+		if(!item.hasItemMeta()) {
+			return amount;
+		}
+
+		ItemMeta meta = item.getItemMeta();
+		
+		if(!(meta instanceof Repairable) || !meta.hasEnchant(Enchantment.MENDING)) {
+			if(meta != null) {
+				meta.getPersistentDataContainer().remove(PARTIAL_REPAIR);
+				updateLore(meta, null);
+			}
+			
+			return amount;
+		}
+		int cost = ((Repairable) meta).getRepairCost();
+		
+		if(cost > 39) {
+			updateLore(meta, "&cUnrepairable");
+		}
+		
+		int partial;
+		{
+			Integer p = meta.getPersistentDataContainer().get(PARTIAL_REPAIR, PersistentDataType.INTEGER);
+			partial = p == null ? 0 : p;
+		}
+		
+		int diff = cost - (partial + 99) / 100;
+		
+		// Reset cost
+		if(diff > 0) {
+			partial = cost * 100;
+		}
+		
+		partial = Math.max(partial - amount, 0);
+		amount -= Math.min(partial, amount);
+		
+		cost = (partial + 99) / 100;
+		
+		((Repairable)meta).setRepairCost(cost);
+		
+		if(partial > 0) {
+			meta.getPersistentDataContainer().set(PARTIAL_REPAIR, PersistentDataType.INTEGER, partial);
+			updateLore(meta, String.valueOf(partial));
+		}
+		else {
+			meta.getPersistentDataContainer().remove(PARTIAL_REPAIR);
+			updateLore(meta, null);
+		}
+		item.setItemMeta(meta);
+		
+		return amount;
+	}
+	
+	@EventHandler
+	public void onAnvil(PrepareAnvilEvent event) {
+		PlayerState.State state = stateConfig.players.get(event.getViewers().get(0).getUniqueId().toString());
+		
+		if(state != null && "new".equals(state.mending_mode) && event.getResult() != null) {
+			ItemStack item = event.getResult();
+			newMend(item, 0);
+			event.setResult(item);
+		}
 	}
 
 	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=true)

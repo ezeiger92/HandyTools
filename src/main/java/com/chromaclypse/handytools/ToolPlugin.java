@@ -3,10 +3,8 @@ package com.chromaclypse.handytools;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ShapedRecipe;
@@ -14,12 +12,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.chromaclypse.api.Log;
-import com.chromaclypse.api.command.Dispatch;
+import com.chromaclypse.api.command.CommandBase;
+import com.chromaclypse.api.command.Context;
 import com.chromaclypse.api.item.ItemBuilder;
 import com.chromaclypse.api.plugin.FuturePlugin;
 import com.chromaclypse.handytools.listener.FarmlandListener;
-import com.chromaclypse.handytools.command.Echo;
-import com.chromaclypse.handytools.command.ModifyItem;
+import com.chromaclypse.handytools.command.General;
+import com.chromaclypse.handytools.command.Moderator;
+import com.chromaclypse.handytools.command.PlayerState;
+import com.chromaclypse.handytools.command.Utilities;
+import com.chromaclypse.handytools.command.SavedLocation;
 import com.chromaclypse.handytools.listener.CauldronItems;
 import com.chromaclypse.handytools.listener.ChainArmorListener;
 import com.chromaclypse.handytools.listener.CustomItemListener;
@@ -31,7 +33,9 @@ import com.chromaclypse.handytools.listener.WoodToolListener;
 public class ToolPlugin extends JavaPlugin {
 	ToolConfig config = new ToolConfig();
 	MobConfig mobConfig = new MobConfig();
+	PlayerState stateConfig = new PlayerState();
 	NCPCompat compat = new NCPCompat();
+	private SavedLocation locations = new SavedLocation();
 	
 	public static ToolPlugin instance;
 	public ToolPlugin() {
@@ -49,10 +53,25 @@ public class ToolPlugin extends JavaPlugin {
 		
 		init();
 		
-		getCommand("handytools").setExecutor(this);
-		getCommand("echo").setExecutor(new Echo());
-		getCommand("util").setExecutor(new Dispatch(ModifyItem.class));
-
+		getCommand("handytools").setExecutor(new CommandBase()
+				.with().arg("reload").calls(this::reloadCommand)
+				.with().arg("saveAxe").calls(this::saveAxeCommand)
+				.with().arg("version").calls(CommandBase::pluginVersion)
+				.getCommand());
+		getCommand("echo").setExecutor(new CommandBase().calls(General::echo).getCommand());
+		getCommand("util").setExecutor(new Utilities(stateConfig).getCommand());
+		{
+			Moderator modCommands = new Moderator(locations);
+			TabExecutor mm = new CommandBase()
+					.calls(modCommands::spectateOn)
+					.with().arg("on").calls(modCommands::spectateOn)
+					.with().arg("off").calls(modCommands::spectateOff)
+					.with().option(CommandBase::onlinePlayers).calls(modCommands::spectatePlayer)
+					.getCommand();
+			getCommand("spectate").setExecutor(mm);
+			getCommand("spectate").setTabCompleter(mm);
+		}
+		
 		{
 			NamespacedKey key = new NamespacedKey(this, "lucky_rabbit_foot");
 			ShapedRecipe recipe = new ShapedRecipe(key, new ItemBuilder(Material.RABBIT_FOOT)
@@ -91,9 +110,11 @@ public class ToolPlugin extends JavaPlugin {
 	private void init() {
 		config.init(this);
 		mobConfig.init(this);
+		locations.init(this);
+		stateConfig.init(this);
 		
 		getServer().getPluginManager().registerEvents(new WoodToolListener(config.wood_tools), this);
-		getServer().getPluginManager().registerEvents(new GoldToolListener(config.gold_tools), this);
+		getServer().getPluginManager().registerEvents(new GoldToolListener(config.gold_tools, stateConfig), this);
 		
 		getServer().getPluginManager().registerEvents(new LeatherArmorListener(config.leather_armor), this);
 		getServer().getPluginManager().registerEvents(new ChainArmorListener(config.chain_armor), this);
@@ -105,22 +126,17 @@ public class ToolPlugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new CauldronItems(config.caudron_recipes), this);
 	}
 	
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(args.length > 0) {
-			String arg1 = args[0];
-			if("reload".equalsIgnoreCase(arg1)) {
-				sender.sendMessage(ChatColor.GREEN + "HandyTools reloaded");
-				onDisable();
-				init();
-			}
-			else if("saveAxe".equalsIgnoreCase(arg1)) {
-				config.wood_tools.axe_item = ((Player)sender).getInventory().getItemInMainHand();
-				Log.info(config.wood_tools.axe_item.serialize().toString());
-				config.save(this);
-			}
-		}
-		
+	public boolean reloadCommand(Context context) {
+		context.Sender().sendMessage(ChatColor.GREEN + "HandyTools reloaded");
+		onDisable();
+		init();
+		return true;
+	}
+	
+	public boolean saveAxeCommand(Context context) {
+		config.wood_tools.axe_item = context.GetHeld();
+		Log.info(config.wood_tools.axe_item.serialize().toString());
+		config.save(this);
 		return true;
 	}
 	

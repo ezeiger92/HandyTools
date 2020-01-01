@@ -1,12 +1,17 @@
 package com.chromaclypse.handytools;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.util.Vector;
+
+import com.chromaclypse.api.Defaults;
 
 public class Util {
 	public static boolean rng(double threshold) {
@@ -87,5 +92,23 @@ public class Util {
 		ItemStack armor = player.getInventory().getBoots();
 		
 		return armor != null && armor.getType() == boots;
+	}
+	
+	public static List<Player> getPlayerMatch(String start) {
+		List<Player> matches = new ArrayList<>();
+		
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			String part = p.getName().toLowerCase();
+			
+			if(part.equals(start)) {
+				matches = Defaults.list(p);
+				break;
+			}
+			if(part.startsWith(start)) {
+				matches.add(p);
+			}
+		}
+		
+		return matches;
 	}
 }

@@ -19,6 +19,11 @@ commands:
     description: Prints text back
     usage: /<command> <args...>
     permission: handytools.feedback
+  spectate:
+    aliases: [spy]
+    description: Spectate command
+    usage: /spectate on|off|<player>
+    permission: handytools.spectate
 permissions:
   handytools.reload:
     description: Reload perm
@@ -26,6 +31,12 @@ permissions:
   handytools.utility:
     description: Utility command perm
     default: op
+  handytools.spectate:
+    description: Spectate command perm
+    default: op
   handytools.feedback:
     description: Feedback commands perm
     default: true
+  handytools.changespawner:
+    description: Change spawner with egg
+    default: false

@@ -12,7 +12,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EnderPearl;
@@ -204,11 +203,14 @@ public class CustomItemListener implements Listener {
 			return;
 		}
 		
+		Block target = loc.getBlock();
+		if(target.getType() != Material.AIR) {
+			return;
+		}
+		
 		useHand(event.getPlayer(), event.getHand());
-		Block target = loc.getWorld().getHighestBlockAt(loc).getRelative(BlockFace.UP);
 		
 		target.setType(Material.END_PORTAL);
-		event.getPlayer().teleport(target.getLocation());
 		
 		Bukkit.getScheduler().runTaskLater(ToolPlugin.instance, () -> {
 			target.setType(Material.AIR);
@@ -300,6 +302,21 @@ public class CustomItemListener implements Listener {
 						
 						loc.getWorld().dropItemNaturally(loc, is);
 					}
+				}
+			}
+		}
+	}
+	
+	// Spawner changing
+	@EventHandler(ignoreCancelled=true)
+	public void onSpawnerClick(PlayerInteractEvent event) {
+		if(event.hasItem() && event.hasBlock()) {
+			ItemStack use = event.getItem();
+			Block target = event.getClickedBlock();
+			
+			if(target.getType() == Material.SPAWNER && use.getType().toString().endsWith("_SPAWN_EGG")) {
+				if(event.getPlayer().getGameMode() != GameMode.CREATIVE && !event.getPlayer().hasPermission("handytools.changespawner")) {
+					event.setCancelled(true);
 				}
 			}
 		}

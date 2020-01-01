@@ -198,8 +198,8 @@ public class FarmlandListener implements Listener {
 		if(crops.contains(above.getType())) {
 			Ageable crop;
 			
-			if(block.getBlockData() instanceof Ageable) {
-				crop = (Ageable) block.getBlockData();
+			if(above.getBlockData() instanceof Ageable) {
+				crop = (Ageable) above.getBlockData();
 				
 				int dec = Math.max(crop.getMaximumAge() / 4, 1);
 				
