@@ -9,6 +9,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.chromaclypse.api.Log;
@@ -18,7 +19,7 @@ import com.chromaclypse.api.item.ItemBuilder;
 import com.chromaclypse.api.plugin.FuturePlugin;
 import com.chromaclypse.handytools.listener.FarmlandListener;
 import com.chromaclypse.handytools.command.General;
-import com.chromaclypse.handytools.command.Moderator;
+import com.chromaclypse.handytools.command.Spectate;
 import com.chromaclypse.handytools.command.PlayerState;
 import com.chromaclypse.handytools.command.Utilities;
 import com.chromaclypse.handytools.command.SavedLocation;
@@ -31,15 +32,17 @@ import com.chromaclypse.handytools.listener.LeatherArmorListener;
 import com.chromaclypse.handytools.listener.WoodToolListener;
 
 public class ToolPlugin extends JavaPlugin {
-	ToolConfig config = new ToolConfig();
-	MobConfig mobConfig = new MobConfig();
-	PlayerState stateConfig = new PlayerState();
-	NCPCompat compat = new NCPCompat();
+	private ToolConfig config = new ToolConfig();
+	private MobConfig mobConfig = new MobConfig();
+	private PlayerState stateConfig = new PlayerState();
+	private NCPCompat compat = new NCPCompat();
 	private SavedLocation locations = new SavedLocation();
+	private Spectate spectator;
 	
 	public static ToolPlugin instance;
 	public ToolPlugin() {
 		instance = this;
+		spectator = new Spectate(locations);
 	}
 	
 	@Override
@@ -61,15 +64,16 @@ public class ToolPlugin extends JavaPlugin {
 		getCommand("echo").setExecutor(new CommandBase().calls(General::echo).getCommand());
 		getCommand("util").setExecutor(new Utilities(stateConfig).getCommand());
 		{
-			Moderator modCommands = new Moderator(locations);
 			TabExecutor mm = new CommandBase()
-					.calls(modCommands::spectateOn)
-					.with().arg("on").calls(modCommands::spectateOn)
-					.with().arg("off").calls(modCommands::spectateOff)
-					.with().option(CommandBase::onlinePlayers).calls(modCommands::spectatePlayer)
+					.calls(spectator::spectateOn)
+					.with().arg("on").calls(spectator::spectateOn)
+					.with().arg("off").calls(spectator::spectateOff)
+					.with().option(CommandBase::onlinePlayers).calls(spectator::spectatePlayer)
 					.getCommand();
 			getCommand("spectate").setExecutor(mm);
 			getCommand("spectate").setTabCompleter(mm);
+			
+			
 		}
 		
 		{
@@ -113,17 +117,21 @@ public class ToolPlugin extends JavaPlugin {
 		locations.init(this);
 		stateConfig.init(this);
 		
-		getServer().getPluginManager().registerEvents(new WoodToolListener(config.wood_tools), this);
-		getServer().getPluginManager().registerEvents(new GoldToolListener(config.gold_tools, stateConfig), this);
+		PluginManager pm = getServer().getPluginManager();
 		
-		getServer().getPluginManager().registerEvents(new LeatherArmorListener(config.leather_armor), this);
-		getServer().getPluginManager().registerEvents(new ChainArmorListener(config.chain_armor), this);
-		getServer().getPluginManager().registerEvents(new GoldArmorListener(config.gold_armor), this);
+		pm.registerEvents(new WoodToolListener(config.wood_tools), this);
+		pm.registerEvents(new GoldToolListener(config.gold_tools, stateConfig), this);
+		
+		pm.registerEvents(new LeatherArmorListener(config.leather_armor), this);
+		pm.registerEvents(new ChainArmorListener(config.chain_armor), this);
+		pm.registerEvents(new GoldArmorListener(config.gold_armor), this);
 
-		getServer().getPluginManager().registerEvents(new CustomItemListener(mobConfig), this);
-		getServer().getPluginManager().registerEvents(new FarmlandListener(), this);
+		pm.registerEvents(new CustomItemListener(mobConfig), this);
+		pm.registerEvents(new FarmlandListener(), this);
 		
-		getServer().getPluginManager().registerEvents(new CauldronItems(config.caudron_recipes), this);
+		pm.registerEvents(new CauldronItems(config.caudron_recipes), this);
+		
+		pm.registerEvents(spectator, this);
 	}
 	
 	public boolean reloadCommand(Context context) {

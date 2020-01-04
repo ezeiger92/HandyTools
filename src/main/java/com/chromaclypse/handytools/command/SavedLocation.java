@@ -10,6 +10,7 @@ import com.chromaclypse.api.config.Section;
 
 @Section(path="locations.yml")
 public class SavedLocation extends ConfigObject {
+	public boolean per_world_permissions = false;
 	public Map<String, State> player_locations = Defaults.emptyMap();
 	public static class State {
 		public Location loc;
